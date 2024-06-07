@@ -26,7 +26,8 @@ def main():
         print(line.decode("utf-8"), end="", file=sys.stderr)
 
     # Wait for the subprocess to finish
-    process.wait()
+    return_code = process.wait()
+    exit(return_code)
 
 
 if __name__ == "__main__":
