@@ -2,6 +2,8 @@ from pathlib import Path
 import secrets
 import shutil
 import string
+import subprocess
+import sys
 
 
 def create_dir_and_copy(dir_name: str) -> Path:
@@ -24,8 +26,8 @@ def main():
 
     # Uncomment this block to pass the first stage
 
-    # command = sys.argv[3]
-    # args = sys.argv[4:]
+    command = sys.argv[3]
+    args = sys.argv[4:]
 
     # Generate a secure random string
     characters = string.ascii_letters + string.digits
@@ -33,22 +35,22 @@ def main():
     # Create working directory for the image
     working_dir = create_dir_and_copy(random_hash)
 
-    # process = subprocess.Popen(
-    #     ["chroot", working_dir, command, *args],
-    #     stdout=subprocess.PIPE,
-    #     stderr=subprocess.PIPE,
-    # )
+    process = subprocess.Popen(
+        ["chroot", working_dir, command, *args],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
 
-    # # Read the output from stdout and print it line by line
-    # for line in process.stdout:
-    #     print(line.decode("utf-8"), end="")
+    # Read the output from stdout and print it line by line
+    for line in process.stdout:
+        print(line.decode("utf-8"), end="")
 
-    # for line in process.stderr:
-    #     print(line.decode("utf-8"), end="", file=sys.stderr)
+    for line in process.stderr:
+        print(line.decode("utf-8"), end="", file=sys.stderr)
 
-    # # Wait for the subprocess to finish
-    # return_code = process.wait()
-    # exit(return_code)
+    # Wait for the subprocess to finish
+    return_code = process.wait()
+    exit(return_code)
 
 
 if __name__ == "__main__":
