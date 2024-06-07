@@ -20,7 +20,7 @@ def main():
 
     # Read the output from stdout and print it line by line
     for line in process.stdout:
-        print(line.decode(), end="")
+        print(line.decode("utf-8"))
 
     # Wait for the subprocess to finish
     process.wait()
