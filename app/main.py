@@ -4,7 +4,7 @@ import sys
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
-    print("Logs from your program will appear here!")
+    # print("Logs from your program will appear here!")
 
     # Uncomment this block to pass the first stage
 
@@ -20,7 +20,7 @@ def main():
 
     # Read the output from stdout and print it line by line
     for line in process.stdout:
-        print(line.decode("utf-8"))
+        print(line.decode("utf-8"), end="")
 
     # Wait for the subprocess to finish
     process.wait()
