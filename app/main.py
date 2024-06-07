@@ -55,6 +55,7 @@ def main():
 
     # Wait for the subprocess to finish
     return_code = process.wait()
+    print("Exit code", return_code)
     exit(return_code)
 
 
