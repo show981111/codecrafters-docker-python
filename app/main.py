@@ -17,6 +17,11 @@ def create_dir_and_copy(dir_name: str) -> Path:
             shutil.copytree(item, dest)
         else:
             shutil.copy2(item, dest)
+
+    dependency_dir = Path("/usr/local/bin")
+    dependency_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(dependency_dir / "docker-explorer", dependency_dir)
+
     return p
 
 
