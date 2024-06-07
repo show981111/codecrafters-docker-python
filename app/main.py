@@ -22,6 +22,9 @@ def main():
     for line in process.stdout:
         print(line.decode("utf-8"), end="")
 
+    for line in process.stderr:
+        print(line.decode("utf-8"), end="", file=sys.stderr)
+
     # Wait for the subprocess to finish
     process.wait()
 
