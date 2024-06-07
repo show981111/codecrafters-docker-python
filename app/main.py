@@ -51,7 +51,7 @@ def main():
         print(line.decode("utf-8"), end="")
 
     for line in process.stderr:
-        print(line.decode("utf-8"), end="ERR", file=sys.stderr)
+        print(line.decode("utf-8"), end="")
 
     # Wait for the subprocess to finish
     return_code = process.wait()
