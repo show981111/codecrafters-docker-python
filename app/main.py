@@ -1,6 +1,5 @@
 from pathlib import Path
-import requests
-import secrets
+from urllib import request
 import shutil
 import string
 import subprocess
@@ -33,7 +32,7 @@ def get_image(image: str):
 
     try:
         # Make the GET request
-        response = requests.get(registry_url)
+        response = request.get(registry_url)
 
         # Check if the request was successful
         if response.status_code == 200:
