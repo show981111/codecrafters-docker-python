@@ -36,7 +36,7 @@ def get_image(image: str, output_dir: Path):
     try:
         image_info = image.split(":")
         image_name = image_info[0]
-        image_version = "latest" if len(image_info) == 0 else image_info[1]
+        image_version = "latest" if len(image_info) == 1 else image_info[1]
 
         registry_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/{image_name}:pull"
         manifest_url = f"https://registry.hub.docker.com/v2/library/{image_name}/manifests/{image_version}"
