@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import urllib.request
 import urllib.error
@@ -7,13 +8,14 @@ import string
 import subprocess
 import sys
 import secrets
+import tarfile
 
 
 def create_dir_and_copy(dir_name: str) -> Path:
-    p = Path(f"../tmp/{dir_name}")
+    p = Path(Path(__file__).parent.parent / f"tmp/{dir_name}")
     p.mkdir(parents=True, exist_ok=True)
 
-    app_dir = Path.cwd() / "app"
+    app_dir = Path(__file__).parent
     for item in app_dir.iterdir():
         dest = p / "app" / item.name
         # print("src", item)
@@ -30,18 +32,50 @@ def create_dir_and_copy(dir_name: str) -> Path:
     return p
 
 
-def get_image(base_url, params):
+def get_image(image: str, output_dir: Path):
     try:
-        # Encode the query parameters
-        query_string = urllib.parse.urlencode(params)
-        full_url = f"{base_url}?{query_string}"
+        image_info = image.split(":")
+        image_name = image_info[0]
+        image_version = "latest" if len(image_info) == 0 else image_info[1]
 
-        # Make the GET request
-        with urllib.request.urlopen(full_url) as response:
+        registry_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/{image_name}:pull"
+        manifest_url = f"https://registry.hub.docker.com/v2/library/{image_name}/manifests/{image_version}"
+
+        token = ""
+        # Get Token
+        with urllib.request.urlopen(registry_url) as response:
             # Read the response content
             response_content = response.read()
-            print("Response Content:")
-            print(response_content)
+            json_content = json.loads(response_content)
+            token = json_content["token"]
+
+        # Get manifest
+        manifest_request = urllib.request.Request(manifest_url)
+        manifest_request.add_header(
+            "Accept", "application/vnd.docker.distribution.manifest.v2+json"
+        )
+        manifest_request.add_header("Authorization", f"Bearer {token}")
+        with urllib.request.urlopen(manifest_request) as response:
+            response_content = response.read()
+            json_content = json.loads(response_content)
+
+            # Pulling layers
+            for layer in json_content["layers"]:
+                layer_req = urllib.request.Request(
+                    f"https://registry.hub.docker.com/v2/library/{image_name}/blobs/{layer['digest']}"
+                )
+                layer_req.add_header("Authorization", f"Bearer {token}")
+
+                layer_path = Path(f"../tmp/docker/{image_name}_{image_version}")
+                layer_path.mkdir(parents=True, exist_ok=True)
+                print("Pulling...", layer["digest"], " --> ", layer_path)
+                with open(layer_path / f"{layer['digest']}.tar", "wb") as f:
+                    with urllib.request.urlopen(layer_req) as layer_response:
+                        f.write(layer_response.read())
+
+                for file in layer_path.iterdir():
+                    ff = tarfile.open(file)
+                    ff.extractall(output_dir)
 
     except urllib.error.HTTPError as e:
         print(f"HTTP error occurred: {e.code} - {e.reason}")
@@ -60,13 +94,12 @@ def main():
     command = sys.argv[3]
     args = sys.argv[4:]
 
-    get_image(image)
-
     # Generate a secure random string
     characters = string.ascii_letters + string.digits
     random_hash = "".join(secrets.choice(characters) for _ in range(8))
     # Create working directory for the image
     working_dir = create_dir_and_copy(random_hash)
+    get_image(image, working_dir)
 
     unshare_command = ["unshare", "--pid", "--mount-proc", "--uts", "--fork"]
 
