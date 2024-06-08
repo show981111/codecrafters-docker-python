@@ -59,7 +59,7 @@ def get_image(image: str, output_dir: Path):
             response_content = response.read()
             json_content = json.loads(response_content)
 
-            print("Json", json_content)
+            # print("Json", json_content)
 
             # Pulling layers
             for layer in json_content["layers"]:
@@ -103,8 +103,8 @@ def main():
     working_dir = create_dir_and_copy(random_hash)
     get_image(image, working_dir)
 
-    for file in working_dir.iterdir():
-        print(file.name)
+    # for file in working_dir.iterdir():
+    #     print(file.name)
 
     unshare_command = ["unshare", "--pid", "--mount-proc", "--uts", "--fork"]
 
