@@ -42,14 +42,14 @@ def get_image(image: str, output_dir: Path):
         manifest_url = f"https://registry.hub.docker.com/v2/library/{image_name}/manifests/{image_version}"
 
         token = ""
-        # Get Token
+        # 1. Get Token
         with urllib.request.urlopen(registry_url) as response:
             # Read the response content
             response_content = response.read()
             json_content = json.loads(response_content)
             token = json_content["token"]
 
-        # Get manifest
+        # 2. Get manifest
         manifest_request = urllib.request.Request(manifest_url)
         manifest_request.add_header(
             "Accept", "application/vnd.docker.distribution.manifest.v2+json"
@@ -59,9 +59,7 @@ def get_image(image: str, output_dir: Path):
             response_content = response.read()
             json_content = json.loads(response_content)
 
-            # print("Json", json_content)
-
-            # Pulling layers
+            # 3. Pulling layers
             for layer in json_content["layers"]:
                 layer_req = urllib.request.Request(
                     f"https://registry.hub.docker.com/v2/library/{image_name}/blobs/{layer['digest']}"
@@ -70,11 +68,13 @@ def get_image(image: str, output_dir: Path):
 
                 layer_path = Path(f"../tmp/docker/{image_name}_{image_version}")
                 layer_path.mkdir(parents=True, exist_ok=True)
+
                 # print("Pulling...", layer["digest"], " --> ", layer_path)
                 with open(layer_path / f"{layer['digest']}.tar", "wb") as f:
                     with urllib.request.urlopen(layer_req) as layer_response:
                         f.write(layer_response.read())
 
+                # 4. Extract them into working dir
                 for file in layer_path.iterdir():
                     ff = tarfile.open(file)
                     ff.extractall(output_dir)
@@ -88,10 +88,6 @@ def get_image(image: str, output_dir: Path):
 
 
 def main():
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    # print("Logs from your program will appear here!")
-
-    # Uncomment this block to pass the first stage
     image = sys.argv[2]
     command = sys.argv[3]
     args = sys.argv[4:]
@@ -99,15 +95,15 @@ def main():
     # Generate a secure random string
     characters = string.ascii_letters + string.digits
     random_hash = "".join(secrets.choice(characters) for _ in range(8))
-    # Create working directory for the image
+
+    # Create working directory for the image and move some dependencies
     working_dir = create_dir_and_copy(random_hash)
+
+    # Pull images and extract them to working directory
     get_image(image, working_dir)
 
-    # for file in working_dir.iterdir():
-    #     print(file.name)
-
+    # Create a new namespace usign unshare + chroot to the working directory where we copied/extracted all dependencies and images.
     unshare_command = ["unshare", "--pid", "--mount-proc", "--uts", "--fork"]
-
     process = subprocess.Popen(
         unshare_command + ["chroot", working_dir, command, *args],
         stdout=subprocess.PIPE,
@@ -123,7 +119,6 @@ def main():
 
     # Wait for the subprocess to finish
     return_code = process.wait()
-    # print("Exit code", return_code)
     exit(return_code)
 
 
