@@ -10,7 +10,8 @@ def create_dir_and_copy(dir_name: str) -> Path:
     p = Path(f"../tmp/{dir_name}")
     p.mkdir(parents=True, exist_ok=True)
 
-    parent_dir = Path.cwd().parent
+    parent_dir = Path.cwd()
+    print("copy", parent_dir)
     for item in parent_dir.iterdir():
         dest = p / "app" / item.name
         if item.is_dir():
