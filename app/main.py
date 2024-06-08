@@ -101,6 +101,9 @@ def main():
     working_dir = create_dir_and_copy(random_hash)
     get_image(image, working_dir)
 
+    for file in working_dir.iterdir():
+        print(file.name)
+
     unshare_command = ["unshare", "--pid", "--mount-proc", "--uts", "--fork"]
 
     process = subprocess.Popen(
