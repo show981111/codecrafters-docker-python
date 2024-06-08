@@ -18,6 +18,7 @@ def create_dir_and_copy(dir_name: str) -> Path:
         else:
             shutil.copy2(item, dest)
 
+    # Copy dependencies
     dependency_dir = p / Path("usr/local/bin")
     dependency_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2("/usr/local/bin/docker-explorer", dependency_dir)
@@ -40,8 +41,10 @@ def main():
     # Create working directory for the image
     working_dir = create_dir_and_copy(random_hash)
 
+    unshare_command = ["unshare", "--pid", "--mount-proc", "--fork"]
+
     process = subprocess.Popen(
-        ["chroot", working_dir, command, *args],
+        unshare_command + ["chroot", working_dir, command, *args],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
