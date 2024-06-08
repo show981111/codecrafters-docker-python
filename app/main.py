@@ -6,6 +6,7 @@ import shutil
 import string
 import subprocess
 import sys
+import secrets
 
 
 def create_dir_and_copy(dir_name: str) -> Path:
@@ -29,7 +30,7 @@ def create_dir_and_copy(dir_name: str) -> Path:
     return p
 
 
-def make_get_request_with_params(base_url, params):
+def get_image(base_url, params):
     try:
         # Encode the query parameters
         query_string = urllib.parse.urlencode(params)
