@@ -11,9 +11,9 @@ def create_dir_and_copy(dir_name: str) -> Path:
     p.mkdir(parents=True, exist_ok=True)
 
     parent_dir = Path.cwd()
-    print("copy", parent_dir)
     for item in parent_dir.iterdir():
         dest = p / "app" / item.name
+        dest.mkdir(parents=True, exist_ok=True)
         print("src", item)
         if item.is_dir():
             shutil.copytree(item, dest)
