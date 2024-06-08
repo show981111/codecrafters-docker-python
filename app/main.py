@@ -17,7 +17,7 @@ def create_dir_and_copy(dir_name: str) -> Path:
 
     app_dir = Path(__file__).parent
     for item in app_dir.iterdir():
-        dest = p / "app" / item.name
+        dest = p / "home/app" / item.name
         # print("src", item)
         if item.is_dir():
             shutil.copytree(item, dest)
