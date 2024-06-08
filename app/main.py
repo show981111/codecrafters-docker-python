@@ -1,4 +1,5 @@
 from pathlib import Path
+import requests
 import secrets
 import shutil
 import string
@@ -27,16 +28,35 @@ def create_dir_and_copy(dir_name: str) -> Path:
     return p
 
 
+def get_image(image: str):
+    registry_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/{image}:pull"
+
+    try:
+        # Make the GET request
+        response = requests.get(registry_url)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            print("Response Content:")
+            print(response.content)  # Print the raw response content
+        else:
+            print(f"Request failed with status code {response.status_code}")
+            print(response.content)  # Print the raw response content
+
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     # print("Logs from your program will appear here!")
 
     # Uncomment this block to pass the first stage
-
+    image = sys.argv[2]
     command = sys.argv[3]
     args = sys.argv[4:]
 
-    print("ARGS", sys.argv)
+    get_image(image)
 
     # Generate a secure random string
     characters = string.ascii_letters + string.digits
