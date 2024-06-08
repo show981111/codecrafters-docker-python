@@ -13,7 +13,7 @@ def create_dir_and_copy(dir_name: str) -> Path:
     app_dir = Path.cwd() / "app"
     for item in app_dir.iterdir():
         dest = p / "app" / item.name
-        print("src", item)
+        # print("src", item)
         if item.is_dir():
             shutil.copytree(item, dest)
         else:
