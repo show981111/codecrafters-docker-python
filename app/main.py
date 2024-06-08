@@ -42,7 +42,7 @@ def main():
     # Create working directory for the image
     working_dir = create_dir_and_copy(random_hash)
 
-    unshare_command = ["unshare", "--pid", "--mount-proc", "--fork"]
+    unshare_command = []  # ["unshare", "--pid", "--mount-proc", "--fork"]
 
     process = subprocess.Popen(
         unshare_command + ["chroot", working_dir, command, *args],
