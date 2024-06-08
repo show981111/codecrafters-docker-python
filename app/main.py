@@ -101,7 +101,7 @@ def main():
     random_hash = "".join(secrets.choice(characters) for _ in range(8))
     # Create working directory for the image
     working_dir = create_dir_and_copy(random_hash)
-    get_image(image, working_dir.parent)
+    get_image(image, working_dir)
 
     # for file in working_dir.iterdir():
     #     print(file.name)
