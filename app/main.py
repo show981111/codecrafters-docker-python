@@ -70,7 +70,7 @@ def get_image(image: str, output_dir: Path):
 
                 layer_path = Path(f"../tmp/docker/{image_name}_{image_version}")
                 layer_path.mkdir(parents=True, exist_ok=True)
-                print("Pulling...", layer["digest"], " --> ", layer_path)
+                # print("Pulling...", layer["digest"], " --> ", layer_path)
                 with open(layer_path / f"{layer['digest']}.tar", "wb") as f:
                     with urllib.request.urlopen(layer_req) as layer_response:
                         f.write(layer_response.read())
