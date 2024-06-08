@@ -5,6 +5,8 @@ Container is just a process.
 1. Chroot: isolate filesystem by changing the root directory for the specific process -> limit the access to host's other files.
 
 2. Namespace: isolate the view of processes. Use clone or unshare to give a separate namespace for the process. By doing this, container doesn't have an access or view of other processes in the host machine.
+    - Clone: [Clone](https://man7.org/linux/man-pages/man2/clone.2.html). Similar to Fork, but more finegrained flags, such as unsharing.
+    - Unshare: [Unshare](https://man7.org/linux/man-pages/man2/unshare.2.html). Doesn't create a child process by default. It just disables sharing the namespace with the parent.
 
 3. Pulling an image and running a program:
     1. Pull image from the docker registry
