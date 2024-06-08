@@ -1,5 +1,7 @@
 from pathlib import Path
-from urllib import request
+import urllib.request
+import urllib.error
+import urllib.parse
 import shutil
 import string
 import subprocess
@@ -27,22 +29,24 @@ def create_dir_and_copy(dir_name: str) -> Path:
     return p
 
 
-def get_image(image: str):
-    registry_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/{image}:pull"
-
+def make_get_request_with_params(base_url, params):
     try:
+        # Encode the query parameters
+        query_string = urllib.parse.urlencode(params)
+        full_url = f"{base_url}?{query_string}"
+
         # Make the GET request
-        response = request.get(registry_url)
-
-        # Check if the request was successful
-        if response.status_code == 200:
+        with urllib.request.urlopen(full_url) as response:
+            # Read the response content
+            response_content = response.read()
             print("Response Content:")
-            print(response.content)  # Print the raw response content
-        else:
-            print(f"Request failed with status code {response.status_code}")
-            print(response.content)  # Print the raw response content
+            print(response_content)
 
-    except requests.exceptions.RequestException as e:
+    except urllib.error.HTTPError as e:
+        print(f"HTTP error occurred: {e.code} - {e.reason}")
+    except urllib.error.URLError as e:
+        print(f"URL error occurred: {e.reason}")
+    except Exception as e:
         print(f"An error occurred: {e}")
 
 
