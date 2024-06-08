@@ -36,13 +36,15 @@ def main():
     command = sys.argv[3]
     args = sys.argv[4:]
 
+    print("ARGS", sys.argv)
+
     # Generate a secure random string
     characters = string.ascii_letters + string.digits
     random_hash = "".join(secrets.choice(characters) for _ in range(8))
     # Create working directory for the image
     working_dir = create_dir_and_copy(random_hash)
 
-    unshare_command = ["unshare", "--pid", "--mount-proc", "--fork"]
+    unshare_command = ["unshare", "--pid", "--mount-proc", "--uts", "--fork"]
 
     process = subprocess.Popen(
         unshare_command + ["chroot", working_dir, command, *args],
