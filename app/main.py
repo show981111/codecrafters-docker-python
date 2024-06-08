@@ -59,6 +59,8 @@ def get_image(image: str, output_dir: Path):
             response_content = response.read()
             json_content = json.loads(response_content)
 
+            print("Json", json_content)
+
             # Pulling layers
             for layer in json_content["layers"]:
                 layer_req = urllib.request.Request(
